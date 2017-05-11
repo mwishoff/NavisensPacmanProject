@@ -4,8 +4,11 @@ using UnityEngine;
 
 public class ClydeMovement : ghostMovement {
 
-    private Vector3 dest;
+    public Vector3 dest;
     Vector3[] clydeScatterTiles;
+    public Color orange;
+    public bool ghostEaten; //true means pacman ate the ghost. false means ghost is still livin and kickin.
+    public Vector3 lastDest;
 
     /*
      * void Start ():
@@ -14,6 +17,9 @@ public class ClydeMovement : ghostMovement {
      */
     void Start()
     {
+        lastDest = base.vects[69];
+        ghostEaten = false;
+        orange = gameObject.GetComponent<Renderer>().material.color;
         this.dest = new Vector3(-2.11f, 3.01f, -44.33f);
         Vector3[] vects = base.board.getVects();
         clydeScatterTiles = new[] { vects[47], vects[46], vects[56],
@@ -35,7 +41,18 @@ public class ClydeMovement : ghostMovement {
 
         if (Vector3.Distance(transform.position, this.dest) <= 0.1f)
         {
-            this.dest = getNextMove(this.dest, base.pacmanGameObject.transform.position, base.board, clydeScatterTiles);
+            if (base.pacmanGameObject == null || base.pacmanGameObject.Equals(null))
+            {
+                GameManager.GMinstance.clydeLocked = true;
+            }
+            else if(ghostEaten == true)
+            {
+                this.dest = base.goToCenter(this.dest, ref this.lastDest, base.board);
+            }
+            else
+            {
+                this.dest = getNextMove(this.dest, base.pacmanGameObject.transform.position, base.board, clydeScatterTiles, ref this.lastDest);
+            }
         }
     }
 
@@ -45,8 +62,8 @@ public class ClydeMovement : ghostMovement {
      * I seperated this out so that ClydeMovement only deals with moving Clyde around the board,
      * so there is no logic in choosing his destination here that is taken care of by the ghostAI.
      */
-    Vector3 getNextMove(Vector3 currVect, Vector3 pacmanLoc, BoardData board, Vector3[] ScatterTiles)
+    Vector3 getNextMove(Vector3 currVect, Vector3 pacmanLoc, BoardData board, Vector3[] ScatterTiles, ref Vector3 lastMove)
     {
-        return base.ghostAI.ClydeMove(currVect, pacmanLoc, board, ScatterTiles);
+        return base.ghostAI.ClydeMove(currVect, pacmanLoc, board, ScatterTiles, ref lastMove);
     }
 }

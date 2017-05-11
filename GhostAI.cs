@@ -10,15 +10,15 @@ public class GhostAI {
      * public Vector3 BlinkyMove(Vector3 currVect, Vector3 pacmanLoc, BoardData board):
      * Done reformatting for the moment.
      */
-    public Vector3 BlinkyMove(Vector3 currVect, Vector3 pacmanLoc, BoardData board, Vector3[] ScatterTiles)
+    public Vector3 BlinkyMove(Vector3 currVect, Vector3 pacmanLoc, BoardData board, Vector3[] ScatterTiles, ref Vector3 lastMove)
     {
-        if (GameManager.GMinstance.getGhostMode() == true)
+        if (GameManager.GMinstance.blinkyMode == true)
         {
-            return AStar(currVect, pacmanLoc, board);
+            return AStar(currVect, pacmanLoc, ref lastMove, board);
         }
-        else if (GameManager.GMinstance.getGhostMode() == false)
+        else if (GameManager.GMinstance.blinkyMode == false)
         {
-            return blinkyScatter(currVect, board, ScatterTiles);
+            return scatterPathCalc(currVect, board, ScatterTiles, ref lastMove);
         }
         else
         {
@@ -31,15 +31,15 @@ public class GhostAI {
      * public Vector3 PinkyMove(Vector3 currVect, Vector3 pacmanLoc, Vector3 pacmanLastLoc, BoardData board):
      * this function targets pinky at the intersection pacman might* be at next.
      */
-    public Vector3 PinkyMove(Vector3 currVect, Vector3 pacmanLoc, Vector3 pacmanLastLoc, BoardData board, Vector3[] ScatterTiles)
+    public Vector3 PinkyMove(Vector3 currVect, Vector3 pacmanLoc, Vector3 pacmanLastLoc, BoardData board, Vector3[] ScatterTiles, ref Vector3 lastMove)
     {
-        if (GameManager.GMinstance.getGhostMode() == true)
+        if (GameManager.GMinstance.pinkyMode == true)
         {
-            return targetPacmanNextIntersection(currVect, pacmanLoc, pacmanLastLoc, board);
+            return targetPacmanNextIntersection(currVect, pacmanLoc, pacmanLastLoc, board, ref lastMove);
         }
-        else if (GameManager.GMinstance.getGhostMode() == false)
+        else if (GameManager.GMinstance.pinkyMode == false)
         {
-            return pinkyScatter(currVect, board, ScatterTiles);
+            return scatterPathCalc(currVect, board, ScatterTiles, ref lastMove);
         }
         else
         {
@@ -53,15 +53,15 @@ public class GhostAI {
      * public Vector3 InkyMove(Vector3 currVect, Vector3 pacmanLoc, Vector3 pacmanLastLoc, BoardData board):
      * Moves like Blinky or Pinky for a duration.
      */
-    public Vector3 InkyMove(Vector3 currVect, Vector3 pacmanLoc, Vector3 pacmanLastLoc, BoardData board, Vector3[] ScatterTiles)
+    public Vector3 InkyMove(Vector3 currVect, Vector3 pacmanLoc, Vector3 pacmanLastLoc, BoardData board, Vector3[] ScatterTiles, ref Vector3 lastMove)
     {
-        if (GameManager.GMinstance.getGhostMode() == true)
+        if (GameManager.GMinstance.InkyMode == true)
         {
-            return selectInkyMove(currVect, pacmanLoc, pacmanLastLoc, board);
+            return selectInkyMove(currVect, pacmanLoc, pacmanLastLoc, board, ref lastMove);
         }
-        else if (GameManager.GMinstance.getGhostMode() == false)
+        else if (GameManager.GMinstance.InkyMode == false)
         {
-            return inkyScatter(currVect, board, ScatterTiles);
+            return scatterPathCalc(currVect, board, ScatterTiles, ref lastMove);
         }
         else
         {
@@ -76,17 +76,17 @@ public class GhostAI {
      * private Vector3 selectInkyMove(Vector3 currVect, Vector3 pacmanLoc, Vector3 pacmanLastLoc, BoardData board):
      * Takes care of figuring out which mode inky is in to decide if he moves like blinky or pinky.
      */
-    private Vector3 selectInkyMove(Vector3 currVect, Vector3 pacmanLoc, Vector3 pacmanLastLoc, BoardData board)
+    private Vector3 selectInkyMove(Vector3 currVect, Vector3 pacmanLoc, Vector3 pacmanLastLoc, BoardData board, ref Vector3 lastMove)
     {
         //Move like blinky
         if (GameManager.GMinstance.inkyMode == 0)
         {
-            return AStar(currVect, pacmanLoc, board);
+            return AStar(currVect, pacmanLoc, ref lastMove, board);
         }
         //Move like Pinky
         else if (GameManager.GMinstance.inkyMode == 1)
         {
-            return targetPacmanNextIntersection(currVect, pacmanLoc, pacmanLastLoc, board);
+            return targetPacmanNextIntersection(currVect, pacmanLoc, pacmanLastLoc, board, ref lastMove);
         }
         //You broke Inky
         else
@@ -101,17 +101,17 @@ public class GhostAI {
      * Should move like Blinky until he is within a certain proximity to pacman.
      * Once he is in a certain proximity to pacman, he should loop to his scatter tiles.
      */
-    public Vector3 ClydeMove(Vector3 currVect, Vector3 pacmanLoc, BoardData board, Vector3[] ScatterTiles)
+    public Vector3 ClydeMove(Vector3 currVect, Vector3 pacmanLoc, BoardData board, Vector3[] ScatterTiles, ref Vector3 lastMove)
     {
         //Clyde will run from pacman once I get scatter working.
         //For now he chases like blinky.
-        if (GameManager.GMinstance.getGhostMode() == true)
+        if (GameManager.GMinstance.clydeMode == true)
         {
-            return selectClydeMove(currVect, pacmanLoc, board, ScatterTiles);
+            return selectClydeMove(currVect, pacmanLoc, board, ScatterTiles, ref lastMove);
         }
-        else if (GameManager.GMinstance.getGhostMode() == false)
+        else if (GameManager.GMinstance.clydeMode == false)
         {
-            return clydeScatter(currVect, board, ScatterTiles);
+            return scatterPathCalc(currVect, board, ScatterTiles, ref lastMove);
         }
         else
         {
@@ -124,15 +124,15 @@ public class GhostAI {
      * public Vector3 selectClydeMove(Vector3 currVect, Vector3 pacmanLoc, BoardData board):
      * Takes care of checking if Clyde is close to pacman. if he is clyde goes to his scatter tiles.
      */
-    public Vector3 selectClydeMove(Vector3 currVect, Vector3 pacmanLoc, BoardData board, Vector3[] ScatterTiles)
+    public Vector3 selectClydeMove(Vector3 currVect, Vector3 pacmanLoc, BoardData board, Vector3[] ScatterTiles, ref Vector3 lastMove)
     {
         if (Vector3.Distance(currVect, pacmanLoc) > 15)
         {
-            return AStar(currVect, pacmanLoc, board);
+            return AStar(currVect, pacmanLoc, ref lastMove, board);
         }
         else
         {
-            return clydeScatter(currVect, board, ScatterTiles);
+            return scatterPathCalc(currVect, board, ScatterTiles, ref lastMove);
         }
     }
 
@@ -142,9 +142,9 @@ public class GhostAI {
      * but instead stays on the board grid. I decided to use A* because it's easy to implement,
      * and also has good performance.
      */
-    private Vector3 AStar(Vector3 currVect, Vector3 pacmanLoc, BoardData board)
+    public Vector3 AStar(Vector3 currVect, Vector3 pacmanLoc, ref Vector3 lastMove, BoardData board)
     {
-        int index = -1;
+        int index = 1;
         float shortestDist = 9999999.9f;
         //Calculate current distance
         //calculate distance from possible vectors to pacmanLoc vector.
@@ -157,7 +157,7 @@ public class GhostAI {
         for (int i = 0; i < vectArr.Count; i++)
         {
             float dist = Vector3.Distance((Vector3)vectArr[i], pacmanLoc);
-            if (dist < shortestDist)
+            if (dist < shortestDist && lastMove != (Vector3)vectArr[i])
             {
                 shortestDist = dist;
                 index = i;
@@ -165,6 +165,8 @@ public class GhostAI {
             //calc distance
             //save shortest distance
         }
+
+        lastMove = currVect;
 
         //return closest vector.
         return (Vector3)vectArr[index];
@@ -175,7 +177,7 @@ public class GhostAI {
      * This algorithm tries to target the next tile pacman will be at. This allows pinky and inky to target the tiles
      * ahead of pacman and have a "ambush" attack pattern, rather than just a "chase" attack pattern.
      */
-    public Vector3 targetPacmanNextIntersection(Vector3 currVect, Vector3 pacmanLoc, Vector3 pacmanLastLoc, BoardData board)
+    public Vector3 targetPacmanNextIntersection(Vector3 currVect, Vector3 pacmanLoc, Vector3 pacmanLastLoc, BoardData board, ref Vector3 lastMove)
     {
         int index = -1;
         float shortestDist = 9999999.9f;
@@ -203,12 +205,14 @@ public class GhostAI {
         {
             dist = Vector3.Distance((Vector3)vectArr[i], pacmanTargetIntersection);
 
-            if (dist < shortestDist)
+            if (dist < shortestDist && lastMove != (Vector3)vectArr[i])
             {
                 shortestDist = dist;
                 index = i;
             }
         }
+
+        lastMove = currVect;
 
         return (Vector3)vectArr[index];
     }
@@ -258,53 +262,49 @@ public class GhostAI {
      * private Vector3 blinkyScatter(Vector3 ghostPos, BoardData board):
      * moved code from blinkyScatter to scatterPathcalc. this function may not be needed now.
      */
+
+    /*
+     * Depricated functions.
     private Vector3 blinkyScatter(Vector3 ghostPos, BoardData board, Vector3[] ScatterTiles)
     {
         return scatterPathCalc(ghostPos, board, ScatterTiles);
     }
 
-    /*
-     * private Vector3 pinkyScatter(Vector3 ghostPos, BoardData board):
-     * moved code from pinkyScatter to scatterPathcalc. this function may not be needed now.
-     */
+
     private Vector3 pinkyScatter(Vector3 ghostPos, BoardData board, Vector3[] ScatterTiles)
     {
         return scatterPathCalc(ghostPos, board, ScatterTiles);
     }
 
-    /*
-     * private Vector3 inkyScatter(Vector3 ghostPos, BoardData board):
-     * moved code from inkyScatter to scatterPathcalc. this function may not be needed now.
-     */
+
     private Vector3 inkyScatter(Vector3 ghostPos, BoardData board, Vector3[] ScatterTiles)
     {
         return scatterPathCalc(ghostPos, board, ScatterTiles);
     }
 
-    /*
-     * private Vector3 clydeScatter(Vector3 ghostPos, BoardData board):
-     * moved code from clydeScatter to scatterPathcalc. this function may not be needed now.
-     */
+
     private Vector3 clydeScatter(Vector3 ghostPos, BoardData board, Vector3[] ScatterTiles)
     {
         return scatterPathCalc(ghostPos, board, ScatterTiles);
     }
+
+    */
 
     /*
      * I've coded the ScatterTiles in a specific order so that I can grab
      * the next one in the array and return it. allowing the ghost to loop around
      * it's specific scatter tile only using this function.
      */
-    private Vector3 scatterPathCalc(Vector3 ghostPos, BoardData board, Vector3[] ScatterTiles)
+    private Vector3 scatterPathCalc(Vector3 ghostPos, BoardData board, Vector3[] ScatterTiles, ref Vector3 lastMove)
     {
         for (int i = 0; i < ScatterTiles.Length; i++)
         {
             if (ScatterTiles[i] == ghostPos && i != ScatterTiles.Length - 1)
             {
-                return AStar(ghostPos, ScatterTiles[i + 1], board);
+                return AStar(ghostPos, ScatterTiles[i + 1], ref lastMove, board);
             }
         }
 
-        return AStar(ghostPos, ScatterTiles[0], board);
+        return AStar(ghostPos, ScatterTiles[0], ref lastMove, board);
     }
 }

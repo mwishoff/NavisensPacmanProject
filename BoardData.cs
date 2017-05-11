@@ -46,6 +46,7 @@ public class BoardData {
      */
     private void initBoardData()
     {
+        //Portal across map is disabled, look at vects 28,29,33, 32 if you want to reenable it.
         this.boardVectors.Add(getKey(this.vects[1]), new ArrayList { this.vects[2], this.vects[7] });
         this.boardVectors.Add(getKey(this.vects[2]), new ArrayList { this.vects[1], this.vects[8], this.vects[3] });
         this.boardVectors.Add(getKey(this.vects[3]), new ArrayList { this.vects[2], this.vects[14] });
@@ -72,13 +73,13 @@ public class BoardData {
         this.boardVectors.Add(getKey(this.vects[24]), new ArrayList { this.vects[18], this.vects[23], this.vects[27]});
         this.boardVectors.Add(getKey(this.vects[25]), new ArrayList { this.vects[27], this.vects[19], this.vects[26]});
         this.boardVectors.Add(getKey(this.vects[26]), new ArrayList { this.vects[25], this.vects[31]});
-        this.boardVectors.Add(getKey(this.vects[27]), new ArrayList { this.vects[24], this.vects[25]});
-        this.boardVectors.Add(getKey(this.vects[28]), new ArrayList { this.vects[29], this.vects[33]});
-        this.boardVectors.Add(getKey(this.vects[29]), new ArrayList { this.vects[28], this.vects[16], this.vects[30], this.vects[37]});
+        this.boardVectors.Add(getKey(this.vects[27]), new ArrayList { this.vects[24], this.vects[25], this.vects[69]});
+        this.boardVectors.Add(getKey(this.vects[28]), new ArrayList { this.vects[29]});
+        this.boardVectors.Add(getKey(this.vects[29]), new ArrayList { this.vects[16], this.vects[30], this.vects[37]});
         this.boardVectors.Add(getKey(this.vects[30]), new ArrayList { this.vects[29], this.vects[23], this.vects[34]});
         this.boardVectors.Add(getKey(this.vects[31]), new ArrayList { this.vects[26], this.vects[32], this.vects[35]});
-        this.boardVectors.Add(getKey(this.vects[32]), new ArrayList { this.vects[31], this.vects[21], this.vects[33], this.vects[42]});
-        this.boardVectors.Add(getKey(this.vects[33]), new ArrayList { this.vects[32], this.vects[28]});
+        this.boardVectors.Add(getKey(this.vects[32]), new ArrayList { this.vects[31], this.vects[21], this.vects[42]});
+        this.boardVectors.Add(getKey(this.vects[33]), new ArrayList { this.vects[32]});
         this.boardVectors.Add(getKey(this.vects[34]), new ArrayList { this.vects[30], this.vects[35], this.vects[38]});
         this.boardVectors.Add(getKey(this.vects[35]), new ArrayList { this.vects[34], this.vects[31], this.vects[41]});
         this.boardVectors.Add(getKey(this.vects[36]), new ArrayList { this.vects[37], this.vects[44]});
@@ -114,6 +115,7 @@ public class BoardData {
         this.boardVectors.Add(getKey(this.vects[66]), new ArrayList { this.vects[65], this.vects[59], this.vects[67]});
         this.boardVectors.Add(getKey(this.vects[67]), new ArrayList { this.vects[66], this.vects[63]});
         this.boardVectors.Add(getKey(this.vects[68]), new ArrayList { this.vects[48], this.vects[49]});
+        this.boardVectors.Add(getKey(this.vects[69]), new ArrayList { this.vects[27]});
     }
 
     /*
@@ -205,5 +207,6 @@ public class BoardData {
         this.vects[66] = new Vector3(-7.62f, 3.01f, 17.63f);
         this.vects[67] = new Vector3(-42.75f, 3.01f, 17.63f);
         this.vects[68] = new Vector3(-2.34f, 3.01f, -2.45f);
+        this.vects[69] = new Vector3(-1.69f, 3.01f, -32.81f);
     }
 }

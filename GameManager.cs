@@ -9,6 +9,13 @@ public class GameManager : MonoBehaviour {
     public static GameManager GMinstance;
     public int PelletsOnBoard;
     public float timer;
+    public float scatterTimer;
+    public int timePoint;
+
+    public GameObject blinky;
+    public GameObject pinky;
+    public GameObject inky;
+    public GameObject clyde;
 
     //True means can't move, false means can move.
     public bool blinkyLocked;
@@ -17,7 +24,14 @@ public class GameManager : MonoBehaviour {
     public bool clydeLocked;
     public int inkyMode;
     // true == chase mode, false == scatter mode.
-    public bool ghostMode;
+
+    public bool blinkyMode;
+    public bool pinkyMode;
+    public bool InkyMode;
+    public bool clydeMode;
+
+    public int[] ghostEatScore = new int[] { 0, 200, 400, 800, 1600 };
+    public int numGhostsEaten = 0;
 
     /*
      * void Awake():
@@ -41,7 +55,10 @@ public class GameManager : MonoBehaviour {
         //Board starts with 240 pellets
         PelletsOnBoard = 240;
         timer = 0;
-        ghostMode = true;
+        blinkyMode = true;
+        pinkyMode = true;
+        InkyMode = true;
+        clydeMode = true;
     }
 
     /*
@@ -57,6 +74,12 @@ public class GameManager : MonoBehaviour {
         pinkyLocked = true;
         inkyLocked = true;
         clydeLocked = true;
+        timePoint = 0;
+
+        blinky = GameObject.Find("Blinky");
+        pinky = GameObject.Find("Pinky");
+        inky = GameObject.Find("Inky");
+        clyde = GameObject.Find("Clyde");
     }
 
     /*
@@ -71,21 +94,24 @@ public class GameManager : MonoBehaviour {
     {
         timer += Time.deltaTime;
 
-        if(PelletsOnBoard < 220)
+        if(PelletsOnBoard == 220)
         {
             Debug.Log("Releasing Pinky at 220 pellets left.");
             pinkyLocked = false;
         }
-        if(PelletsOnBoard < 200)
+        if(PelletsOnBoard == 200)
         {
             Debug.Log("Releasing Inky at 200 pellets left.");
             inkyLocked = false;
         }
-        if (PelletsOnBoard < 180)
+        if (PelletsOnBoard == 180)
         {
             Debug.Log("Releasing Clyde at 180 pellets left.");
             clydeLocked = false;
         }
+
+
+        scatterTime();
 
 
         if (GameManager.GMinstance.getGameTime() % 20 == 0 && inkyMode == 0)
@@ -97,7 +123,6 @@ public class GameManager : MonoBehaviour {
             inkyMode = 0;
         }
 
-
         if (checkForDidWin() == true)
         {
             blinkyLocked = true;
@@ -106,6 +131,52 @@ public class GameManager : MonoBehaviour {
             clydeLocked = true;
         }
 	}
+
+    void scatterTime()
+    {
+        if (blinkyMode == false ||
+            pinkyMode == false ||
+            InkyMode == false ||
+            clydeMode == false)
+        {
+            scatterTimer += Time.deltaTime;
+            if (scatterTimer > timePoint + 12)
+            {
+                setGhostColorOrig();
+                blinkyMode = true;
+                pinkyMode = true;
+                InkyMode = true;
+                clydeMode = true;
+            }
+        }
+        if (blinkyMode == true &&
+            pinkyMode == true &&
+            InkyMode == true &&
+            clydeMode == true)
+        {
+            timer += Time.deltaTime;
+        }
+    }
+
+    void setGhostColorOrig()
+    {
+        if(blinky.GetComponent<BlinkyMovement>().ghostEaten == false)
+        {
+            blinky.GetComponent<Renderer>().material.color = blinky.GetComponent<BlinkyMovement>().red;
+        }
+        if(pinky.GetComponent<PinkyMovement>().ghostEaten == false)
+        {
+            pinky.GetComponent<Renderer>().material.color = pinky.GetComponent<PinkyMovement>().pink;
+        }
+        if(inky.GetComponent<InkyMovement>().ghostEaten == false)
+        {
+            inky.GetComponent<Renderer>().material.color = inky.GetComponent<InkyMovement>().lightBlue;
+        }
+        if(clyde.GetComponent<ClydeMovement>().ghostEaten == false)
+        {
+            clyde.GetComponent<Renderer>().material.color = clyde.GetComponent<ClydeMovement>().orange;
+        } 
+    }
 
     /*
      * public bool checkForDidWin():
@@ -128,25 +199,5 @@ public class GameManager : MonoBehaviour {
     public int getGameTime()
     {
         return (int)timer;
-    }
-
-    /*
-     * public void setGhostMode(bool newMode):
-     * this function can change the ghosts from chase mode
-     * to scatter mode.
-     */
-    public void setGhostMode(bool newMode)
-    {
-        ghostMode = newMode;
-    }
-
-    /*
-     * public bool getGhostMode():
-     * This function will return which mode
-     * the ghosts are currently chasing in.
-     */
-    public bool getGhostMode()
-    {
-        return ghostMode;
     }
 }
